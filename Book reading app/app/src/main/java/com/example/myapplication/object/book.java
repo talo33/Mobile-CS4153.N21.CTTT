@@ -1,9 +1,17 @@
 package com.example.myapplication.object;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class book {
     private String bookName, booknum, picLink;
     public book() {
 
+    }
+    public book(JSONObject o) throws JSONException {
+        bookName = o.getString("bookName");
+        booknum = o.getString("booknum");
+        picLink = o.getString("picLink");
     }
     public book(String bookName, String booknum, String picLink) {
         this.bookName = bookName;

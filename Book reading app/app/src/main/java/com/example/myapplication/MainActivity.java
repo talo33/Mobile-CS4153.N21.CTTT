@@ -7,14 +7,21 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Toast;
 
 
 import com.example.myapplication.adapter.BookAdapter;
+import com.example.myapplication.api.ApiGetBook;
+import com.example.myapplication.interfaces.GetBook;
 import com.example.myapplication.object.book;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GetBook {
     GridView gdvListOfBook;
     BookAdapter badapter;
     ArrayList<book> bookArrayList;
@@ -28,19 +35,12 @@ public class MainActivity extends AppCompatActivity {
         mapping();
         setup();
         setClick();
+        new ApiGetBook(this).execute();
     }
 
     private void init() {
         bookArrayList = new ArrayList<>();
-        bookArrayList.add(new book("H", "Nick Arnold - Tony De Saulles", "https://nhasachmienphi.com/images/thumbnail/nhasachmienphi-horrible-science-vi-sinh-vat-vi-tinh.jpg"));
-        bookArrayList.add(new book("H", "Phil Gates, Tony De Saulles", "https://nhasachmienphi.com/images/thumbnail/nhasachmienphi-horrible-science-vat-ly-cau-chuyen-cua-nhung-luc-bi-hiem.jpg"));
-        bookArrayList.add(new book("A", "Phil Gates, Tony De Saulles", "https://nhasachmienphi.com/images/thumbnail/nhasachmienphi-horrible-science-thien-nhien-hoang-da.jpg"));
-        bookArrayList.add(new book("H", "Nick Arnold - Tony De Saulles", "https://nhasachmienphi.com/images/thumbnail/nhasachmienphi-horrible-science-vi-sinh-vat-vi-tinh.jpg"));
-        bookArrayList.add(new book("D", "Phil Gates, Tony De Saulles", "https://nhasachmienphi.com/images/thumbnail/nhasachmienphi-horrible-science-vat-ly-cau-chuyen-cua-nhung-luc-bi-hiem.jpg"));
-        bookArrayList.add(new book("H", "Phil Gates, Tony De Saulles", "https://nhasachmienphi.com/images/thumbnail/nhasachmienphi-horrible-science-thien-nhien-hoang-da.jpg"));
-        bookArrayList.add(new book("H", "Nick Arnold - Tony De Saulles", "https://nhasachmienphi.com/images/thumbnail/nhasachmienphi-horrible-science-vi-sinh-vat-vi-tinh.jpg"));
-        bookArrayList.add(new book("H", "Phil Gates, Tony De Saulles", "https://nhasachmienphi.com/images/thumbnail/nhasachmienphi-horrible-science-vat-ly-cau-chuyen-cua-nhung-luc-bi-hiem.jpg"));
-        bookArrayList.add(new book("H", "Phil Gates, Tony De Saulles", "https://nhasachmienphi.com/images/thumbnail/nhasachmienphi-horrible-science-thien-nhien-hoang-da.jpg"));
+
 
         badapter = new BookAdapter(this, 0, bookArrayList);
     }
@@ -81,4 +81,29 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void start() {
+        Toast.makeText(this, "getting start", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void end(String data) {
+        try {
+            bookArrayList.clear();
+            JSONArray arr = new JSONArray(data);
+            for(int i=0; i<arr.length(); i++){
+                JSONObject o = arr.getJSONObject(i);
+                bookArrayList.add(new book(o));
+            }
+            badapter = new BookAdapter(this, 0, bookArrayList);
+            gdvListOfBook.setAdapter(badapter);
+        }catch (JSONException e){
+
+        }
+    }
+
+    @Override
+    public void err() {
+        Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+    }
 }
